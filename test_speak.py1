@@ -1,0 +1,3 @@
+from voice.speak import speak
+
+speak("Hello! I am Jarvis, testing voice output.")
