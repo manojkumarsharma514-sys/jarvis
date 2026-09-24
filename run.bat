@@ -18,11 +18,11 @@ exit /b 1
 
 :ollama_ready
 echo Ollama is ready.
-echo Starting JARVIS...
+echo Starting JARVIS HUD...
 if exist ".venv\Scripts\python.exe" (
-    ".venv\Scripts\python.exe" main.py --cli
+    ".venv\Scripts\python.exe" main.py --hud --voice
 ) else (
-    python main.py --cli
+    python main.py --hud --voice
 )
 
 pause
