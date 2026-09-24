@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -25,6 +27,16 @@ class Memory:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_message TEXT NOT NULL,
                 assistant_message TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+        self.conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS actions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                action TEXT NOT NULL,
+                details TEXT NOT NULL,
                 created_at TEXT NOT NULL
             )
             """
@@ -57,9 +69,28 @@ class Memory:
         )
         self.conn.commit()
 
+    def add_action(self, action: str, details: str) -> None:
+        self.conn.execute(
+            "INSERT INTO actions(action, details, created_at) VALUES(?, ?, ?)",
+            (action, details, datetime.now().isoformat()),
+        )
+        self.conn.commit()
+
     def recent_history(self, limit: int = 5):
         rows = self.conn.execute(
             "SELECT user_message, assistant_message FROM history ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+        return list(reversed(rows))
+
+    def all_memory(self):
+        return self.conn.execute(
+            "SELECT key, value, updated_at FROM memory ORDER BY updated_at DESC"
+        ).fetchall()
+
+    def recent_actions(self, limit: int = 10):
+        rows = self.conn.execute(
+            "SELECT action, details, created_at FROM actions ORDER BY id DESC LIMIT ?",
             (limit,),
         ).fetchall()
         return list(reversed(rows))
